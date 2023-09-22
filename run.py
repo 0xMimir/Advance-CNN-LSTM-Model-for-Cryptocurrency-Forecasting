@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, Namespace
-from src.data import download_data
+from src import download_data, create_model, load_data, prepare_data, split_dataset
 from os.path import exists 
 from os import mkdir
 
@@ -36,6 +36,8 @@ def main():
     match action:
         case 'download':
             download(args)
+        case 'train':
+            train(args)
             
 
 def download(args: Namespace):
@@ -52,6 +54,16 @@ def download(args: Namespace):
     
     return
 
+
+def train(args: Namespace):
+    symbols = args.coins.split(',')
+    timeframe = args.timeframe
+    exchange = args.exchange
+    data_dir = args.data_dir
+
+    df = load_data(symbols, exchange, timeframe, data_dir)
+    df = prepare_data(df, symbols[0])
+    train_x, train_y, test_x, test_y = split_dataset(df)
 
 if __name__ == "__main__":
     main()

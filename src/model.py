@@ -1,8 +1,10 @@
 from keras.layers import Input, Conv1D, MaxPool1D, LSTM, Dense, BatchNormalization, Dropout, concatenate
 from keras.models import Model
+from keras.optimizers import Adam
 
 
-def create_model(features: int, inputs: int, **options):
+# Default values come from paper
+def create_model(inputs: int, **options):
     input_layers = []
     concat_layers = []
 
@@ -12,7 +14,7 @@ def create_model(features: int, inputs: int, **options):
     input_neurons = options.get('input_neurons', 50)
 
     for _ in range(inputs):
-        input_layer = Input((lookback, features))
+        input_layer = Input((lookback, 1))
         conv_layer = Conv1D(filters=filters, kernel_size=kernel_size)(input_layer)
         pooling = MaxPool1D()(conv_layer)
         lstm = LSTM(input_neurons)(pooling)
