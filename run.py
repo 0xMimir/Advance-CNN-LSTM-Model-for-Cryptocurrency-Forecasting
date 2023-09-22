@@ -1,5 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from src.data import download_data
+from os.path import exists 
+from os import mkdir
 
 def get_args() -> Namespace:
     parser = ArgumentParser(description='Advance CNN LSTM Model for Cryptocurrency Forecasting')
@@ -40,10 +42,13 @@ def download(args: Namespace):
     coins = args.coins.split(',')
     timeframe = args.timeframe
     exchange = args.exchange
+    data_dir = args.data_dir
+
+    if not exists(data_dir):
+        mkdir(data_dir)
     
     for symbol in coins:
-        download_data(symbol, timeframe, exchange)
-        break
+        download_data(symbol, timeframe, exchange, data_dir)
     
     return
 
