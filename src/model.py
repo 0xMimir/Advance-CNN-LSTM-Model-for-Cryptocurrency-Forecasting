@@ -24,11 +24,11 @@ def create_model(inputs: int, **options):
     concat_layer = concatenate(concat_layers)
     dense1 = Dense(options.get('dense1', 256))(concat_layer)
     batch_nl1 = BatchNormalization()(dense1)
-    dropout1 = Dropout(options.get('dropout1', 0.3))(batch_nl1)
+    dropout1 = Dropout(options.get('dropout1', 0.5))(batch_nl1)
 
     dense2 = Dense(options.get('dense2', 64))(dropout1)
     batch_nl2 = BatchNormalization()(dense2)
-    dropout2 = Dropout(options.get('dropout2', 0.2))(batch_nl2)
+    dropout2 = Dropout(options.get('dropout2', 0.25))(batch_nl2)
 
     output_layer = Dense(1)(dropout2)
 

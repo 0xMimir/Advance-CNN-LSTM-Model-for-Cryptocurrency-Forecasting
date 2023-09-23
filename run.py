@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, Namespace
-from src import download_data, create_model, load_data, prepare_data, split_dataset
+from src import download_data, create_model, load_data, prepare_data, split_dataset, plot_history
 from os.path import exists 
 from os import mkdir
 
@@ -16,7 +16,7 @@ def get_args() -> Namespace:
         '--timeframe', default='d', help='Timeframe of input data: d for 1 day, h for hour, m for minute', choices=['d', 'h', 'm']
     )
     parser.add_argument(
-        '--target', default='BTC-close', help='Feature to train on'
+        '--target', default='close', help='Feature to train on'
     )
     parser.add_argument(
         '--data-dir', default='./data', help="Where is training data located"
@@ -56,14 +56,31 @@ def download(args: Namespace):
 
 
 def train(args: Namespace):
-    symbols = args.coins.split(',')
-    timeframe = args.timeframe
-    exchange = args.exchange
-    data_dir = args.data_dir
+    kwargs = args.__dict__
 
-    df = load_data(symbols, exchange, timeframe, data_dir)
+    symbols = kwargs.pop('coins').split(',')
+    timeframe = kwargs.pop('timeframe')
+    exchange = kwargs.pop('exchange')
+    data_dir = kwargs.pop('data_dir')
+
+    df = load_data(symbols, exchange, timeframe, data_dir, **kwargs)
     df = prepare_data(df, symbols[0])
     train_x, train_y, test_x, test_y = split_dataset(df)
+
+    model = create_model(len(symbols), **kwargs)
+
+    history = model.fit(
+        x = [i for i in train_x],
+        y = train_y,
+        epochs=100,
+        validation_data=(
+            [i for i in test_x],
+            test_y
+        )
+    ).history
+    
+    plot_history(history, 'loss')
+
 
 if __name__ == "__main__":
     main()
