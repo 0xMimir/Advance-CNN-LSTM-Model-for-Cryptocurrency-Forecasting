@@ -1,6 +1,6 @@
 # Advance CNN LSTM Model for Cryptocurrency Forecasting
 
-This model is based on this [research paper](https://github.com/0xMimir/Advance-CNN-LSTM-Model-for-Cryptocurrency-Forecasting/blob/main/paper.pdf), this model utilizes input data from multiple crypto currencies instead of only using one. Using more than one cryptocurrency info data gives model general overview of market instead of only focusing on one asset, this also avoids over fitting, and when right params are put it's highly competitive model. In this repo I have not optimized model.
+This model is based on this [research paper](https://github.com/0xMimir/Advance-CNN-LSTM-Model-for-Cryptocurrency-Forecasting/blob/master/paper.pdf), this model utilizes input data from multiple crypto currencies instead of only using one. Using more than one cryptocurrency info data gives model general overview of market instead of only focusing on one asset, this also avoids over fitting, and when right params are put it's highly competitive model. In this repo I have not optimized model.
 
 Requirements
 ---
