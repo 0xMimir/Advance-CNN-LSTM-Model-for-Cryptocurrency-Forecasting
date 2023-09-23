@@ -1,7 +1,9 @@
 from argparse import ArgumentParser, Namespace
 from src import download_data, create_model, load_data, prepare_data, split_dataset, plot_history
-from os.path import exists 
+from keras.models import load_model
+from os.path import exists
 from os import mkdir
+from datetime import datetime
 
 def get_args() -> Namespace:
     parser = ArgumentParser(description='Advance CNN LSTM Model for Cryptocurrency Forecasting')
@@ -38,6 +40,8 @@ def main():
             download(args)
         case 'train':
             train(args)
+        case 'predict':
+            predict(args)
             
 
 def download(args: Namespace):
@@ -64,7 +68,7 @@ def train(args: Namespace):
     data_dir = kwargs.pop('data_dir')
 
     df = load_data(symbols, exchange, timeframe, data_dir, **kwargs)
-    df = prepare_data(df, symbols[0])
+    df = prepare_data(df, symbols[0], True)
     train_x, train_y, test_x, test_y = split_dataset(df)
 
     model = create_model(len(symbols), **kwargs)
@@ -80,6 +84,32 @@ def train(args: Namespace):
     ).history
     
     plot_history(history, 'loss')
+    model.save('model.hdf5')
+
+def predict(args: Namespace):
+    print("Downloading latest data")
+    download(args)
+
+    kwargs = args.__dict__
+
+    symbols = kwargs.pop('coins').split(',')
+    timeframe = kwargs.pop('timeframe')
+    exchange = kwargs.pop('exchange')
+    data_dir = kwargs.pop('data_dir')
+    lookback = kwargs.get('lookback', 30)
+
+    df = load_data(symbols, exchange, timeframe, data_dir, **kwargs)
+    df = prepare_data(df, symbols[0], False)
+    unix = (df.iloc[-1].name + (df.iloc[-1].name - df.iloc[-2].name)) / 1000
+    unix = datetime.fromtimestamp(unix)
+
+    df = df.iloc[-lookback:].to_numpy()
+    df = df.reshape(len(symbols), 1, lookback, 1)
+
+    model = load_model('model.hdf5')
+    prediction = model.predict([i for i in df], verbose=False)[0, 0] * 100
+
+    print(f"Predicted return for {symbols[0]} is {prediction:.4f}%, prediction time: {unix}")
 
 
 if __name__ == "__main__":

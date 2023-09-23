@@ -31,9 +31,12 @@ def load_data(symbols: list[str], exchange: str, timeframe: str, data_dir: str, 
 
     return concat(data.values(), axis=1).dropna()
 
-def prepare_data(df: DataFrame, target: str) -> DataFrame:
+def prepare_data(df: DataFrame, target: str, train: bool) -> DataFrame:
     df = df.pct_change()
-    df['target'] = df[target].shift(-1)
+
+    if train:
+        df['target'] = df[target].shift(-1)
+        
     return df.dropna()
 
 
