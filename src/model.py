@@ -4,7 +4,7 @@ from keras.optimizers import Adam
 
 
 # Default values come from paper
-def create_model(inputs: int, **options):
+def create_model(inputs: int, classify: bool = True, **options):
     input_layers = []
     concat_layers = []
 
@@ -30,7 +30,7 @@ def create_model(inputs: int, **options):
     batch_nl2 = BatchNormalization()(dense2)
     dropout2 = Dropout(options.get('dropout2', 0.25))(batch_nl2)
 
-    output_layer = Dense(1)(dropout2)
+    output_layer = Dense(2, activation='softmax') if classify else Dense(1)(dropout2)
 
     model = Model(inputs=input_layers, outputs=[output_layer])
     model.compile(

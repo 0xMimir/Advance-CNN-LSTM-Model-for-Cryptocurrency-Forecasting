@@ -26,6 +26,9 @@ def get_args() -> Namespace:
     parser.add_argument(
         '--exchange', default='binance', help="From what exchange to download data"
     )
+    parser.add_argument(
+        '--classify', default=False, help="Should model try to predict next value or will market direction"
+    )
 
     return parser.parse_args()
 
