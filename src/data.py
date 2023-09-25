@@ -5,7 +5,7 @@ from pandas import DataFrame, read_csv, concat, Series
 from numpy import ndarray, zeros
 from sklearn.preprocessing import OneHotEncoder
 
-encoder = OneHotEncoder()
+encoder = OneHotEncoder(categories=[['buy', 'sell']], max_categories=2, sparse_output=False, handle_unknown='ignore')
 
 def download_data(symbol: str, timeframe: str, exchange: str, data_dir: str):
     url = f"https://www.cryptodatadownload.com/cdd/{exchange.capitalize()}_{symbol.upper()}_{timeframe}.csv"
@@ -62,7 +62,9 @@ def split_dataset(df: DataFrame, lookback: int = 30, split_ratio: float = 0.9, c
     features = [column for column in df.columns if not column == 'target']
 
     if classify:
-        df['target'] = encoder.fit_transform(df['target'].to_numpy().reshape(-1, 1)).toarray()
+        target = encoder.fit_transform(df['target'].to_numpy().reshape(-1, 1))
+    else:
+        target = df['target'].to_numpy()
 
     x = zeros(shape)
     y = zeros((df_shape[0] - lookback, output))
@@ -70,7 +72,7 @@ def split_dataset(df: DataFrame, lookback: int = 30, split_ratio: float = 0.9, c
     for index in range(lookback, len(df)):
         row = df.iloc[index - lookback: index][features].to_numpy().reshape(shape[1:])
         x[index - lookback] = row
-        y[index - lookback] = df.iloc[index - 1]['target']
+        y[index - lookback] = target[index - 1]
 
     split = int(shape[0] * split_ratio)
 

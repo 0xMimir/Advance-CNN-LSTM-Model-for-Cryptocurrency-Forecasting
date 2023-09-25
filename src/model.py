@@ -29,7 +29,7 @@ def create_model(inputs: int, classify: bool = True, **options):
 
     dense2 = Dense(options.get('dense2', 64))(dropout1)
     batch_nl2 = BatchNormalization()(dense2)
-    dropout2 = Dropout(options.get('dropout2', 0.25))(batch_nl2)
+    dropout2 = Dropout(options.get('dropout2', 0.3))(batch_nl2)
 
     output_layer = Dense(2, activation='softmax', name='output') if classify else Dense(1, name='output')
     output_layer = output_layer(dropout2)

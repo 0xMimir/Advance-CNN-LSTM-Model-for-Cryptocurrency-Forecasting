@@ -69,25 +69,29 @@ def train(args: Namespace):
     timeframe = kwargs.pop('timeframe')
     exchange = kwargs.pop('exchange')
     data_dir = kwargs.pop('data_dir')
+    classify = kwargs.get('classify')
 
     df = load_data(symbols, exchange, timeframe, data_dir, **kwargs)
-    df = prepare_data(df, symbols[0], True)
+    df = prepare_data(df, symbols[0], classify)
+    # print(df['target'])
     train_x, train_y, test_x, test_y = split_dataset(df)
-
+    # print(train_y)
+    # print(test_y)
+    # exit()
     model = create_model(len(symbols), split_ratio=0.85, **kwargs)
 
     history = model.fit(
         x = [i for i in train_x],
         y = train_y,
-        epochs=100,
+        epochs=10,
         validation_data=(
             [i for i in test_x],
             test_y
         )
     ).history
     
-    plot_history(history, 'acc')
-    model.save('model.hdf5')
+    plot_history(history, 'acc' if classify else 'loss')
+    model.save('model.keras')
 
 def predict(args: Namespace):
     print("Downloading latest data")
