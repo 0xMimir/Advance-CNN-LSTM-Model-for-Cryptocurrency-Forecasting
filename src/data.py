@@ -3,9 +3,6 @@ from .exceptions import DataDownload
 from os.path import join
 from pandas import DataFrame, read_csv, concat, Series
 from numpy import ndarray, zeros
-from sklearn.preprocessing import OneHotEncoder
-
-encoder = OneHotEncoder(categories=[['buy', 'sell']], max_categories=2, sparse_output=False, handle_unknown='ignore')
 
 def download_data(symbol: str, timeframe: str, exchange: str, data_dir: str):
     url = f"https://www.cryptodatadownload.com/cdd/{exchange.capitalize()}_{symbol.upper()}_{timeframe}.csv"
@@ -62,7 +59,9 @@ def split_dataset(df: DataFrame, lookback: int = 30, split_ratio: float = 0.9, c
     features = [column for column in df.columns if not column == 'target']
 
     if classify:
-        target = encoder.fit_transform(df['target'].to_numpy().reshape(-1, 1))
+        target = zeros((len(df), 2))
+        target[df['target'] == 'buy'] = [1, 0]
+        target[df['target'] == 'sell'] = [0, 1]
     else:
         target = df['target'].to_numpy()
 

@@ -2,5 +2,4 @@ __pycache__/
 /data
 
 plot.png
-model.hdf5
-model.keras
+*model.keras

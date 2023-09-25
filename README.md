@@ -49,10 +49,20 @@ python3 run.py --coins BTCUSDT,LTCUSDT,XMRUSDT predict
 Predicted return for BTCUSDT is 0.4935%, prediction time: 2023-09-23 02:00:00
 ```
 
+### Classify
+
+If you wish to get classified output, eg. buy or sell instead of return, run all train and predict with `--classify` flag
+```bash
+python3 run.py train --classify
+...
+python3 run.py predict --classify
+Prediction for BTCUSDT is 0.6479%, prediction time: 2023-09-25 02:00:00
+```
+
 ### Notes
 
 This model is very bare bone implementation of algo from paper mentioned above:
 * it only uses simple input data.
 * it doesn't have optimization to find best markets.
 * it has only one data source, ie. cryptodatadownload instead of using handlers directly from exchanges
-* it doesn't have variable output, eg. trying to predict market change instead of asset change, or trying to do classification
+* it doesn't have variable output, eg. trying to predict market change instead of asset change
