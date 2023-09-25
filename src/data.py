@@ -1,7 +1,7 @@
 from requests import get
 from .exceptions import DataDownload
 from os.path import join
-from pandas import DataFrame, read_csv, concat
+from pandas import DataFrame, read_csv, concat, Series
 from numpy import ndarray, zeros
 
 def download_data(symbol: str, timeframe: str, exchange: str, data_dir: str):
@@ -29,30 +29,49 @@ def load_data(symbols: list[str], exchange: str, timeframe: str, data_dir: str, 
         df = df.rename(columns={target: symbol})
         data[symbol] = df[symbol]
 
-    return concat(data.values(), axis=1).dropna()
 
-def prepare_data(df: DataFrame, target: str, train: bool) -> DataFrame:
+    df = concat(data.values(), axis=1).dropna()
+    return df
+
+def prepare_data(df: DataFrame, target: str, train: bool, classify: bool = True) -> DataFrame:
     df = df.pct_change()
 
     if train:
-        df['target'] = df[target].shift(-1)
+        change = df[target].shift(-1)
+        if classify:
+            target = change.copy()
+
+            target[change > 0] = 'buy'
+            target[change <= 0] = 'sell'
+        else:
+            target = change
+    
+        df['target'] = target
         
     return df.dropna()
 
 
-def split_dataset(df: DataFrame, lookback: int = 30, split_ratio: float = 0.9) -> (ndarray, ndarray, ndarray, ndarray):
+def split_dataset(df: DataFrame, lookback: int = 30, split_ratio: float = 0.9, classify: bool = True) -> (ndarray, ndarray, ndarray, ndarray):
     df_shape = df.shape
+    output = 2 if classify else 1
     shape = (df_shape[0] - lookback, lookback, df_shape[1] - 1, 1)
 
     features = [column for column in df.columns if not column == 'target']
 
+    if classify:
+        target = zeros((len(df), 2))
+        target[df['target'] == 'buy'] = [1, 0]
+        target[df['target'] == 'sell'] = [0, 1]
+    else:
+        target = df['target'].to_numpy()
+
     x = zeros(shape)
-    y = zeros((df_shape[0] - lookback, 1, 1))
+    y = zeros((df_shape[0] - lookback, output))
 
     for index in range(lookback, len(df)):
         row = df.iloc[index - lookback: index][features].to_numpy().reshape(shape[1:])
         x[index - lookback] = row
-        y[index - lookback] = df.iloc[index - 1]['target']
+        y[index - lookback] = target[index - 1]
 
     split = int(shape[0] * split_ratio)
 
