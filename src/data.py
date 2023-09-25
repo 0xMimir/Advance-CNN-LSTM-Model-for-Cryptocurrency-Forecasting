@@ -65,7 +65,7 @@ def split_dataset(df: DataFrame, lookback: int = 30, split_ratio: float = 0.9, c
         df['target'] = encoder.fit_transform(df['target'].to_numpy().reshape(-1, 1)).toarray()
 
     x = zeros(shape)
-    y = zeros((df_shape[0] - lookback, 1, output))
+    y = zeros((df_shape[0] - lookback, output))
 
     for index in range(lookback, len(df)):
         row = df.iloc[index - lookback: index][features].to_numpy().reshape(shape[1:])

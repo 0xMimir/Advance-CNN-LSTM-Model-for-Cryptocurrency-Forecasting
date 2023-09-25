@@ -1,6 +1,7 @@
 pandas~=2.0.2
-numpy~=1.25.0
+numpy>=1.22.0
 plotly
 
 requests~=2.31.0
 keras~=2.13.1rc0
+tensorflow==2.13

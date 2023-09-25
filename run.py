@@ -27,7 +27,7 @@ def get_args() -> Namespace:
         '--exchange', default='binance', help="From what exchange to download data"
     )
     parser.add_argument(
-        '--classify', default=False, help="Should model try to predict next value or will market direction"
+        '--classify', default=True, help="Should model try to predict next value or will market direction"
     )
 
     return parser.parse_args()
@@ -74,7 +74,7 @@ def train(args: Namespace):
     df = prepare_data(df, symbols[0], True)
     train_x, train_y, test_x, test_y = split_dataset(df)
 
-    model = create_model(len(symbols), **kwargs)
+    model = create_model(len(symbols), split_ratio=0.85, **kwargs)
 
     history = model.fit(
         x = [i for i in train_x],
@@ -86,7 +86,7 @@ def train(args: Namespace):
         )
     ).history
     
-    plot_history(history, 'loss')
+    plot_history(history, 'acc')
     model.save('model.hdf5')
 
 def predict(args: Namespace):
